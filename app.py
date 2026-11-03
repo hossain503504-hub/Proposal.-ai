@@ -23,9 +23,15 @@ Job Description:
 Desired Tone/Style:
 {tone}
 
+Proposal Length:
+{length}
+
+Custom Instructions / Extra Notes from Freelancer:
+{custom_notes}
+
 Key Rules:
-1. First 2 lines MUST hook the client immediately by demonstrating deep understanding of their specific pain point (no generic greetings like "Dear Hiring Manager").
-2. Showcase clear value proposition and past relevant experience/approach.
+1. First 2 lines MUST hook the client immediately by demonstrating deep understanding of their specific pain points.
+2. Show a clear value proposition and past relevant experience/approach.
 3. Keep sentences short, crisp, and high-impact.
 4. Include 1-2 relevant clarifying questions that encourage the client to reply.
 5. End with a subtle, non-pushy Call to Action (CTA).
@@ -43,18 +49,26 @@ def generate_proposal():
         data = request.json
         job_description = data.get('job_description', '').strip()
         tone = data.get('tone', 'Professional & Direct')
+        length = data.get('length', 'Medium')
+        custom_notes = data.get('custom_notes', 'None')
 
         if not job_description:
             return jsonify({'success': False, 'error': 'Job description cannot be empty.'}), 400
 
         if not API_KEY:
-            return jsonify({'success': False, 'error': 'Google API Key missing on server. Set GOOGLE_API_KEY environment variable.'}), 500
+            return jsonify({'success': False, 'error': 'Google API Key missing on server.'}), 500
 
-        model = genai.GenerativeModel('gemini-pro')
-        prompt = PROPOSAL_PROMPT_TEMPLATE.format(job_description=job_description, tone=tone)
+        # Gemini Model Initialization
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        prompt = PROPOSAL_PROMPT_TEMPLATE.format(
+            job_description=job_description, 
+            tone=tone, 
+            length=length, 
+            custom_notes=custom_notes if custom_notes else 'None'
+        )
         
         response = model.generate_content(prompt)
-        
+
         return jsonify({
             'success': True,
             'proposal': response.text
