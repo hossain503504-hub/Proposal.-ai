@@ -50,7 +50,7 @@ def generate_proposal():
         if not API_KEY:
             return jsonify({'success': False, 'error': 'Google API Key missing on server. Set GOOGLE_API_KEY environment variable.'}), 500
 
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-1.5-pro')
         prompt = PROPOSAL_PROMPT_TEMPLATE.format(job_description=job_description, tone=tone)
         
         response = model.generate_content(prompt)
