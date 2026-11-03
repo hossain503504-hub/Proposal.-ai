@@ -1,134 +1,261 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proposals.ai - AI Proposal Generator for Freelancers</title>
+    <title>Proposals.ai - AI-Powered Job Proposal Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #090a0f;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(120, 50, 255, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
             min-height: 100vh;
+            color: #f8fafc;
         }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .glass {
+            background: rgba(18, 24, 38, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #090a0f; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
-<body class="p-4 md:p-8 font-sans">
-    <div class="max-w-3xl mx-auto space-y-6">
-        
-        <!-- Header -->
-        <header class="text-center space-y-2">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold">
-                <i class="fa-solid me-1 fa-rocket"></i> Early Beta Access 1.0
-            </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
-                Proposals.ai
-            </h1>
-            <p class="text-slate-400 text-sm md:text-base">Turn client job posts into high-converting proposals in seconds.</p>
-        </header>
+<body class="flex flex-col min-h-screen">
 
-        <!-- Main Form Card -->
-        <div class="glass-card rounded-2xl p-5 md:p-6 shadow-2xl space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1">
-                    <i class="fa-solid fa-briefcase text-indigo-400 mr-1"></i> Upwork / Client Job Description
-                </label>
-                <textarea id="jobDescription" rows="6" 
-                    class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                    placeholder="Paste the full job post here..."></textarea>
-            </div>
-
-            <!-- Tone Selector & Actions -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Writing Style / Tone</label>
-                    <select id="toneSelect" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="Professional & Direct">🎯 Professional & Direct (Best Overall)</option>
-                        <option value="Short & Punchy (Bullet Points)">⚡ Short & Punchy (High Scanability)</option>
-                        <option value="Problem Solving & Technical">🛠️ Deep Technical & Solution-Focused</option>
-                        <option value="Casual & Friendly">💬 Casual & Friendly Conversation</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button id="generateBtn" onclick="generateProposal()" 
-                        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-2.5 rounded-xl transition duration-200 shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Proposal
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Output Section -->
-        <div id="outputSection" class="hidden glass-card rounded-2xl p-5 md:p-6 shadow-2xl space-y-4 border-indigo-500/30">
-            <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
-                <h3 class="font-bold text-slate-200 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i> Optimized Pitch Ready
-                </h3>
-                <button onclick="copyToClipboard()" class="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
-                    <i class="fa-regular fa-copy"></i> <span id="copyBtnText">Copy Text</span>
-                </button>
-            </div>
-            
-            <div id="proposalOutput" class="text-sm text-slate-300 leading-relaxed space-y-2"></div>
-        </div>
-
+    <!-- Toast Notification Container -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-all duration-300 bg-slate-900 border border-slate-700 text-slate-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 text-sm">
+        <span id="toastIcon">✨</span>
+        <span id="toastMsg">Success message</span>
     </div>
 
+    <!-- Navbar -->
+    <header class="w-full border-b border-slate-800/80 bg-slate-950/50 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center font-bold text-white shadow-lg shadow-purple-500/30">P</div>
+            <span class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-purple-400 bg-clip-text text-transparent">Proposals.ai</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <span class="px-2.5 py-1 text-xs font-semibold text-purple-400 bg-purple-950/80 rounded-full border border-purple-800/50 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> v1.2 Live
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 flex flex-col items-center justify-start p-4 md:p-8 max-w-3xl mx-auto w-full">
+        
+        <!-- Hero Section -->
+        <div class="text-center my-6">
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-3">
+                Win clients on autopilot.
+            </h1>
+            <p class="text-sm md:text-base text-slate-400 max-w-lg mx-auto">
+                Transform any Upwork or freelance job post into a high-converting, pitch-perfect proposal in seconds.
+            </p>
+        </div>
+
+        <!-- Input Card -->
+        <div class="glass rounded-2xl p-5 md:p-8 shadow-2xl w-full mb-6 relative overflow-hidden">
+            
+            <!-- Job Description -->
+            <div class="mb-5">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-xs font-semibold tracking-wider text-slate-300 uppercase">📋 Client Job Description</label>
+                    <span id="charCount" class="text-xs text-slate-500">0 characters</span>
+                </div>
+                <textarea id="jobDesc" rows="6" oninput="updateCharCount()" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition placeholder-slate-600" placeholder="Paste the full job post details here..."></textarea>
+            </div>
+
+            <!-- Options Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <div>
+                    <label class="block text-xs font-semibold tracking-wider text-slate-300 uppercase mb-2">🎯 Writing Style / Tone</label>
+                    <select id="tone" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition">
+                        <option value="Professional & Direct">Professional & Direct (Recommended)</option>
+                        <option value="Short & Punchy">Short & Punchy</option>
+                        <option value="Deep Technical & Expert">Deep Technical & Expert</option>
+                        <option value="Friendly & Conversational">Friendly & Conversational</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold tracking-wider text-slate-300 uppercase mb-2">📏 Proposal Length</label>
+                    <select id="length" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition">
+                        <option value="Medium">Medium (Balanced)</option>
+                        <option value="Short">Short & Direct</option>
+                        <option value="Detailed">Detailed & Comprehensive</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Custom Notes -->
+            <div class="mb-6">
+                <label class="block text-xs font-semibold tracking-wider text-slate-300 uppercase mb-2">💡 Custom Highlights / Key Points (Optional)</label>
+                <input type="text" id="customNotes" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition placeholder-slate-600" placeholder="e.g., Mention I have 3 years of React & Python experience...">
+            </div>
+
+            <!-- Generate Button -->
+            <button onclick="generateProposal()" id="genBtn" class="w-full py-4 px-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:opacity-95 text-white font-bold rounded-xl shadow-lg shadow-purple-600/25 transition-all duration-200 flex items-center justify-center space-x-2 text-sm tracking-wide">
+                <span>✨ Generate High-Converting Proposal</span>
+            </button>
+        </div>
+
+        <!-- Result Box -->
+        <div id="resultContainer" class="glass rounded-2xl p-5 md:p-8 shadow-2xl w-full hidden mb-8 border border-purple-500/20">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+                <h3 class="text-sm font-bold tracking-wider text-purple-300 uppercase flex items-center gap-2">🔥 Generated Proposal</h3>
+                <div class="flex items-center space-x-2">
+                    <button onclick="downloadTxt()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center gap-1 text-slate-300">📥 Download</button>
+                    <button onclick="copyProposal()" id="copyBtn" class="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-xs font-medium rounded-lg border border-purple-500/30 transition text-purple-300">📋 Copy</button>
+                </div>
+            </div>
+            <div id="proposalOutput" class="text-sm text-slate-200 leading-relaxed bg-slate-900/50 p-4 rounded-xl border border-slate-800/80"></div>
+        </div>
+
+        <!-- Saved History Section -->
+        <div class="glass rounded-2xl p-5 shadow-xl w-full">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xs font-semibold tracking-wider text-slate-400 uppercase">📜 Recent Proposals History</h3>
+                <button onclick="clearHistory()" class="text-xs text-rose-400 hover:underline">Clear History</button>
+            </div>
+            <div id="historyList" class="space-y-2 text-xs text-slate-400">
+                <p class="text-slate-500 italic">No saved proposals yet.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-6 text-xs text-slate-600 border-t border-slate-900">
+        Built with Google Gemini & Flask • Proposals.ai © 2026
+    </footer>
+
     <script>
+        function updateCharCount() {
+            const len = document.getElementById('jobDesc').value.length;
+            document.getElementById('charCount').innerText = `${len} characters`;
+        }
+
+        function showToast(message, icon = '✨') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            document.getElementById('toastIcon').innerText = icon;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
         async function generateProposal() {
-            const jobDesc = document.getElementById('jobDescription').value.trim();
-            const tone = document.getElementById('toneSelect').value;
-            const btn = document.getElementById('generateBtn');
-            const outputSec = document.getElementById('outputSection');
-            const outputDiv = document.getElementById('proposalOutput');
+            const jobDesc = document.getElementById('jobDesc').value.trim();
+            const tone = document.getElementById('tone').value;
+            const length = document.getElementById('length').value;
+            const customNotes = document.getElementById('customNotes').value.trim();
+            const btn = document.getElementById('genBtn');
+            const resultContainer = document.getElementById('resultContainer');
+            const output = document.getElementById('proposalOutput');
 
             if (!jobDesc) {
-                alert('Please paste a job description first!');
+                showToast('Please paste a job description first!', '⚠️');
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Writing Winning Pitch...`;
+            btn.innerHTML = '⏳ Crafting Winning Pitch...';
 
             try {
-                const res = await fetch('/generate-proposal', {
+                const response = await fetch('/generate-proposal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ job_description: jobDesc, tone: tone })
+                    body: JSON.stringify({ job_description: jobDesc, tone, length, custom_notes: customNotes })
                 });
 
-                const data = await res.json();
+                const data = await response.json();
                 if (data.success) {
-                    outputDiv.innerHTML = marked.parse(data.proposal);
-                    outputSec.classList.remove('hidden');
-                    outputSec.scrollIntoView({ behavior: 'smooth' });
+                    output.innerHTML = marked.parse(data.proposal);
+                    resultContainer.classList.remove('hidden');
+                    saveToHistory(jobDesc.substring(0, 40) + '...', data.proposal);
+                    loadHistory();
+                    showToast('Proposal generated successfully! 🎉', '🚀');
+                    resultContainer.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    alert('Error: ' + data.error);
+                    showToast('Error: ' + data.error, '❌');
                 }
             } catch (err) {
-                alert('Something went wrong. Please check your internet or API key.');
+                showToast('Something went wrong. Please try again.', '❌');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Generate Proposal`;
+                btn.innerHTML = '✨ Generate High-Converting Proposal';
             }
         }
 
-        function copyToClipboard() {
+        function copyProposal() {
             const outputText = document.getElementById('proposalOutput').innerText;
-            navigator.clipboard.writeText(outputText).then(() => {
-                const btnText = document.getElementById('copyBtnText');
-                btnText.innerText = 'Copied!';
-                setTimeout(() => btnText.innerText = 'Copy Text', 2000);
-            });
+            navigator.clipboard.writeText(outputText);
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.innerText = '✅ Copied!';
+            showToast('Proposal copied to clipboard!', '📋');
+            setTimeout(() => copyBtn.innerText = '📋 Copy', 2000);
         }
+
+        function downloadTxt() {
+            const outputText = document.getElementById('proposalOutput').innerText;
+            const blob = new Blob([outputText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'proposal.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Proposal downloaded as text file!', '📥');
+        }
+
+        function saveToHistory(title, proposal) {
+            let history = JSON.parse(localStorage.getItem('proposal_history')) || [];
+            history.unshift({ title, proposal, date: new Date().toLocaleDateString() });
+            if (history.length > 5) history.pop();
+            localStorage.setItem('proposal_history', JSON.stringify(history));
+        }
+
+        function loadHistory() {
+            let history = JSON.parse(localStorage.getItem('proposal_history')) || [];
+            const historyList = document.getElementById('historyList');
+            if (history.length === 0) {
+                historyList.innerHTML = '<p class="text-slate-500 italic">No saved proposals yet.</p>';
+                return;
+            }
+            historyList.innerHTML = history.map((item, index) => `
+                <div class="p-2.5 bg-slate-900/60 rounded-xl border border-slate-800/80 flex justify-between items-center transition hover:border-slate-700">
+                    <span class="truncate w-3/4 text-slate-300 font-medium">${item.title}</span>
+                    <button onclick="viewHistory(${index})" class="text-purple-400 hover:text-purple-300 font-semibold px-2 py-1 bg-purple-950/40 rounded-lg">View</button>
+                </div>
+            `).join('');
+        }
+
+        function viewHistory(index) {
+            let history = JSON.parse(localStorage.getItem('proposal_history')) || [];
+            if (history[index]) {
+                document.getElementById('proposalOutput').innerHTML = marked.parse(history[index].proposal);
+                document.getElementById('resultContainer').classList.remove('hidden');
+                document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+                showToast('Loaded proposal from history!', '📂');
+            }
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('proposal_history');
+            loadHistory();
+            showToast('History cleared!', '🗑️');
+        }
+
+        window.onload = loadHistory;
     </script>
 </body>
 </html>
